@@ -4,32 +4,29 @@
 	Books List
 {% endblock %}
 
-<body>
 {% block content %}
-<h1>Book Review application</h1>
-        <hr>
-        <ul>
-          {% for item in book_list %}
-          <li>
-              <span>Title: </span> <span>{{ item.book.title }}</span>
-              <br>
-              <span>Publisher: </span><span>{{ item.book.publisher }}</span>
-              <br>
-              <span>Publication Date: </span><span>{{ item.book.publication_date }}</span>
-              <br>
-              <span>Rating: </span><span>{{ item.book_rating }}</span>
-              <br>
-              <span>Number of reviews: </span><span>{{ item.number_of_reviews }}</span>
-              <br>
-              {% if item.book_rating is null %}
-              <span>Provide a rating and write the first review for this book.</span>
-              <br>
-              {% endif %}
-          </li>
+<h1>Book Review Application</h1>
+<hr>
+<ul>
+    {% for item in book_list %}
+    <li>
+        <span class="text-info">Title: </span> <span><b>{{ item.book.title }}</b></span>
         <br>
-          {% endfor %}
-        </ul>
-
+       <span class="text-info">Publisher: </span><span><b>{{ item.book.publisher }}</b></span>
+        <br>
+        <span class="text-info">Publication Date: </span><span><b>{{ item.book.publication_date }}</b></span>
+        <br>
+        <span class="text-info">Rating: </span><span class="label label-primary"><b>{{ item.book_rating }}</b></span>
+        <br>
+        <span class="text-info">Number of reviews: </span><span><b>{{ item.number_of_reviews }}</b></span>
+        <br>
+        {% if item.book_rating is null %}
+        <span>Provide a rating and write the first review for this book.</span>
+        <br>
+        {% endif %}
+        <a class="btn btn-primary btn-sm active" role="button" aria-pressed="true" href="/books/{{ item.book.id }}/">Reviews</a>
+    </li>
+    <br>
+    {% endfor %}
+</ul>
 {% endblock %}
- 
-</body>

@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import TemplateView
@@ -46,7 +47,7 @@ def book_list(request):
     for book in books:
         reviews = book.review_set.all()
         if reviews:
-            book_rating = average_rating([review.rating for review in reviews])
+            book_rating = reviews.aggregate(Avg('rating'))['rating__avg'] if reviews else None
             number_of_reviews = len(reviews)
         else:
             book_rating = None
@@ -59,3 +60,22 @@ def book_list(request):
         'book_list': book_list
     }
     return render(request, 'reviews/book_list.html', context)
+
+
+def book_detail(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+    reviews = book.review_set.all()
+    if reviews:
+        book_rating = reviews.aggregate(Avg('rating'))['rating__avg'] if reviews else None
+        context = {
+            'book': book,
+            'book_rating': book_rating,
+            'reviews': reviews
+        }
+    else:
+        context = {
+            'book': book,
+            'book_rating': None,
+            'reviews': None
+        }
+    return render(request, 'reviews/book_detail.html', context)
