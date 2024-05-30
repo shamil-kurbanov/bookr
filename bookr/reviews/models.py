@@ -20,6 +20,14 @@ class Book(models.Model):
     publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
     contributors = models.ManyToManyField('Contributor', through='BookContributor')
 
+    def isbn13(self):
+        """
+        Returns the ISBN 13 string.
+
+        '9780316769174' => '978-0-31-67917-4'
+        """
+        return f"{self.isbn[:3]}-{self.isbn[3:4]}-{self.isbn[4:6]}-{self.isbn[6:12]}-{self.isbn[12:13]}"
+
     def __str__(self):
         return self.title
 
@@ -44,6 +52,9 @@ class BookContributor(models.Model):
     contributor = models.ForeignKey(Contributor, on_delete=models.CASCADE)
     role = models.CharField(verbose_name="The role this contributor had in the book",
                             choices=ContributionRole.choices, max_length=20)
+
+    def __str__(self):
+        return f"{self.contributor} - {self.role}"
 
 
 class Review(models.Model):
