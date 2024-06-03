@@ -3,10 +3,12 @@ from reviews.models import (Book, Publisher, Contributor,
                             BookContributor, Review)
 
 
+# ------------------BookAdmin class -------------------------
 class BookAdmin(admin.ModelAdmin):
     date_hierarchy = 'publication_date'
     list_display = ('title', 'isbn13', 'publication_date', 'has_isbn')
     list_filter = ('publisher', 'publication_date')
+    search_fields = ('title', 'isbn', 'publisher__name')
 
     @admin.display(
         ordering='isbn',
@@ -30,6 +32,13 @@ class BookAdmin(admin.ModelAdmin):
         return bool(obj.isbn)
 
 
+# ------------------ReviewAdmin class -------------------------
+class ReviewAdmin(admin.ModelAdmin):
+    fieldsets = ((None, {'fields': ('creator', 'book')}),
+                 ('Review content',
+                  {'fields': ('content', 'rating')}))
+
+
 @admin.display(
     description='Publisher',
 )
@@ -43,6 +52,7 @@ def initialled_name(obj):
 
 class ContributorAdmin(admin.ModelAdmin):
     list_display = (initialled_name, "first_name", "last_name")
+    list_filter = ('last_name',)
     search_fields = ('first_name', 'last_name')
 
 
@@ -51,4 +61,4 @@ admin.site.register(Publisher)
 admin.site.register(Contributor, ContributorAdmin)
 admin.site.register(Book, BookAdmin)
 admin.site.register(BookContributor)
-admin.site.register(Review)
+admin.site.register(Review, ReviewAdmin)
