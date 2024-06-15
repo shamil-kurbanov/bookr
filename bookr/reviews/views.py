@@ -4,6 +4,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import TemplateView
 
 from reviews.models import Book
+
+from .forms import SearchForm
+from .models import Contributor
 from .utils import average_rating
 
 
@@ -17,11 +20,34 @@ def index(request):
 
 def book_search(request):
     search_text = request.GET.get('search', '')
-    context = {
-        'search_text': search_text,
-    }
-    return render(request, 'reviews/search-results.html', context=context)
+    form = SearchForm(request.GET)
+    books = set()
 
+    if form.is_valid() and form.cleaned_data['search']:
+        search = form.cleaned_data['search']
+        search_in = form.cleaned_data.get('search_in') or 'title'
+        if search_in == 'title':
+            books = Book.objects.filter(title__icontains=search)
+        else:
+            fname_contributors = Contributor.objects.filter(first_name__icontains=search)
+
+            for contributor in fname_contributors:
+                for book in contributor.books.all():
+                    books.add(book)
+
+            lname_contributors = Contributor.objects.filter(
+                last_name__icontains=search
+            )
+
+            for contributor in lname_contributors:
+                for book in contributor.book_set.all():
+                    books.add(book)
+
+    return render(
+        request,
+        "reviews/search-results.html",
+        {"form": form, "search_text": search_text, "books": books},
+    )
 
 # http://127.0.0.1:8000/book_search/?search=test
 
